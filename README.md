@@ -2,13 +2,14 @@
 
 # CNaaS-NMS
 
-Campus Network-as-a-Service - Network Management System. Software to automate management of a campus network (LAN). This is an open source software developed as part of SUNETs managed service.
+Campus Network-as-a-Service - Network Management System. Software to automate management of a campus network (LAN). This
+is an open source software developed as part of SUNETs managed service.
 
 Planned features:
 1. Zero-touch provisioning of switches
-1. Automation of common changes for campus LAN
-1. Automated procedure for firmware upgrades
-1. Multi-vendor support
+2. Automation of common changes for campus LAN
+3. Automated procedure for firmware upgrades
+4. Multi-vendor support
 
 [Documentation](https://cnaas-nms.readthedocs.io/)
 
@@ -21,32 +22,37 @@ Planned features:
 Docker and docker-compose or:
 
 1. python3.7 or later
-1. install requirements.txt
-1. SQL database, Redis
+2. install requirements.txt
+3. SQL database, Redis
 
 ## Installation
 
-Install docker and docker-compose and run: docker-compose build -f docker/docker-compose.yaml
+Install docker and docker-compose and run: `docker-compose build -f docker/docker-compose.yaml`
 
-Or install locally by creating a virtualenv and activate the environment, then:
+Or install a dev environment locally by creating a virtualenv and activate the environment, then:
 
-```
-python3 -m pip install -r requirements.txt
+**Note:** a folder `/etc/cnaas-nms` should exist with write permissions for the user that runs the server. 
+
+```bash
+python3 -m pip install -r requirements-dev.txt
 cp etc/db_config.yml.sample /etc/cnaas-nms/db_config.yml
+JWT_ENABLED=0 PERMISSIONS_DISABLED=1 alembic upgrade heads
+cd src
+JWT_ENABLED=0 PERMISSIONS_DISABLED=1 PYTHONPATH=. python cnaas_nms/run.py
 ```
 
 Edit db_config.yml to point to your SQL and redis database.
 
 ## Test
 
-```
+```bash
 cd src/
 pytest
 ```
 
 Two marks can be used for pytest: `integration` and `equipment`, that can be be used to do a subset of all tests. Eg
 
-```
+```bash
 pytest -m "not integration and not equipment"
 ```
 
@@ -54,13 +60,16 @@ Note that `and` must be used to apply filters at the same time.
 
 If the tests should not spin up any containers at all, set the environment variable `EXTERNAL_TEST_CONTAINERS`, eg
 
-```
+```bash
 EXTERNAL_TEST_CONTAINERS=1 pytest -m "not equipment"
 ```
 
 ## Authorization
 
-Currently we can use two styles for the authorization. We can use the original style or use OIDC style. For OIDC we need to define some env variables or add a auth_config.yaml in the config. The needed variables are: OIDC_CONF_WELL_KNOWN_URL, OIDC_CLIENT_SECRET, OIDC_CLIENT_ID, FRONTEND_CALLBACK_URL and OIDC_ENABLED. To use the OIDC style the last variable needs to be set to true.
+Currently we can use two styles for the authorization. We can use the original style or use OIDC style. For OIDC we need
+to define some env variables or add a auth_config.yaml in the config. The needed variables are:
+`OIDC_CONF_WELL_KNOWN_URL`, `OIDC_CLIENT_SECRET`, `OIDC_CLIENT_ID`, `FRONTEND_CALLBACK_URL` and `OIDC_ENABLED`. To use the OIDC
+style the last variable needs to be set to true.
 
 ## License
 
